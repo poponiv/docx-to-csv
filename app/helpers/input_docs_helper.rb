@@ -1,0 +1,2 @@
+module InputDocsHelper
+end
