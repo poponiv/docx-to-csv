@@ -14,8 +14,9 @@
 <table border="3">
    <thead>
       <tr>
-         <th>Candidate Name</th>
-         <th>Download Link</th>
+         <th>File Name</th>
+         <th>Download Docx</th>
+         <th>Download CSV</th>
          <th>Action</th>
       </tr>
    </thead>
@@ -26,7 +27,9 @@
          <tr>
             <td><%= input_doc.name %></td>
             <td><%= link_to "Download", input_doc.attachment_url %></td>
-            <td><%= link_to "Delete",  input_doc, method: :delete, confirm: "Are you sure you want to delete #{input_doc.name}?" %></td>
+            <td><%= link_to "CSV", "#{input_doc.attachment_url}.csv" %></td>
+            <td><%= link_to "Delete",  input_doc, method: :delete %>
+            </td>
          </tr>
 
       <% end %>
