@@ -1,0 +1,23 @@
+.container
+  - if !flash[:notice].blank?
+    %div
+      = flash[:notice]
+  %br/
+  = link_to "New docx file", new_input_doc_path
+  %br/
+  %br/
+  %table{:border => "3"}
+    %thead
+      %tr
+        %th File Name
+        %th Download Docx
+        %th Download CSV
+        %th Action
+    %tbody
+      - @input_docs.each do |input_doc|
+        %tr
+          %td= input_doc.name
+          %td= link_to "Download", input_doc.attachment_url
+          %td= link_to "CSV", "#{input_doc.attachment_url}.csv"
+          %td
+            = link_to "Delete",  input_doc, method: :delete
