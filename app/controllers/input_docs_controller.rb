@@ -12,11 +12,13 @@ class InputDocsController < ApplicationController
   def create
     @input_doc = InputDoc.new(input_doc_params)
     if @input_doc.save
-      redirect_to input_docs_path, notice: "Successfully uploaded."
       convert_to_csv @input_doc
+      notice = "Successfully uploaded."
     else
-      render "new"
+      notice = "Upload Failed: #{@input_doc.errors.first[1]}"
     end
+
+    redirect_to input_docs_path, notice: notice
   end
 
   def destroy

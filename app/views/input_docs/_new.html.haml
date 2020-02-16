@@ -1,0 +1,21 @@
+- if !@input_doc
+  - @input_doc = InputDoc.new
+
+
+.row
+  .col-md-6
+    = form_for @input_doc, html: { multipart: true } do |f|
+      .row
+        .col
+          = f.label :name
+          = f.text_field :name, {class: 'form-control'}
+      .row
+        .col
+          .input-group.mb-3
+            .custom-file
+              = f.file_field :attachment, class: 'custom-file-input'
+              = f.label :attachment, "blah", class: 'custom-file-label'
+      .row
+        .col
+          = f.submit "Save", {class: 'btn btn-primary'}
+
