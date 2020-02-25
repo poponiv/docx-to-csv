@@ -22,5 +22,4 @@
             %td= input_doc.name
             %td= link_to "Download", input_doc.attachment_url
             %td= link_to "CSV", "#{input_doc.attachment_url}.csv"
-            %td
-              = link_to "Delete",  input_doc, method: :delete
+            %td= link_to "Delete", input_doc, method: :delete

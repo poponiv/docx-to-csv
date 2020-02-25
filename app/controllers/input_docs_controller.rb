@@ -10,14 +10,15 @@ class InputDocsController < ApplicationController
   end
 
   def create
-    @input_doc = InputDoc.new(input_doc_params)
-    if @input_doc.save
+    begin
+      @input_doc = InputDoc.new(input_doc_params)
+      @input_doc.name = File.basename(@input_doc.attachment_url) if @input_doc.attachment_url.present?
+      @input_doc.save!
       convert_to_csv @input_doc
       notice = "Successfully uploaded."
-    else
-      notice = "Upload Failed: #{@input_doc.errors.first[1]}"
+    rescue Exception => e
+      notice = "Upload Failed: #{e.message}"
     end
-
     redirect_to input_docs_path, notice: notice
   end
 
@@ -32,28 +33,34 @@ class InputDocsController < ApplicationController
     doc = Docx::Document.open(input_doc.attachment.current_path)
     File.open(input_doc.attachment.current_path + '.csv' , 'w') do |csv_output_file|
       paragraphs = doc.paragraphs.filter { |p| !p.text.empty? }
-      components = 0
       csv_output_file << "Article Title:,\"#{escape_quotes(paragraphs[0].text)}\",,\n,,,\n"
       csv_output_file << 'Page #,Page Titles,Page Content,Image URL'
-      next_output_line = ''
+      next_output_line = ','
       page_num = 0
-      paragraphs.each do |p|
-        if page_num == 0
-          next_output_line += ','
-          page_num = 1
-          components = 2
-          next
-        end
-        if is_title(p) && components > 0
-          filler = ',' * (3 - components)
+      components = 2
+      paragraphs.each_with_index do |p, ind|
+        if is_title(p)
+          filler = ',' * ([3 - components, 0].max)
+
           csv_output_file << "\n#{next_output_line}#{filler}"
           next_output_line = ''
           components = 0
           page_num += 1
         end
-        next_output_line += (components > 0) ? ",\"#{escape_quotes(p.text)}\"" : "#{page_num},\"#{escape_quotes(p.text)}\""
+        if components > 0
+          if paragraphs[ind+1].present? && !is_title(paragraphs[ind+1]) && !is_title(paragraphs[ind-1])
+            next_output_line.chop!
+            next_output_line += "\n#{escape_quotes(p.text)}\""
+          else
+            next_output_line += ",\"#{escape_quotes(p.text)}\""
+          end
+        else
+          next_output_line += "#{page_num},\"#{escape_quotes(p.text)}\""
+        end
         components += 1
       end
+      filler = ',' * ([3 - components, 0].max)
+      csv_output_file << "\n#{next_output_line}#{filler}"
     end
   end
 
