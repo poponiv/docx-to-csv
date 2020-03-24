@@ -36,9 +36,11 @@ class InputDocsController < ApplicationController
       csv_output_file << "Article Title:,\"#{escape_quotes(paragraphs[0].text)}\",,\n,,,\n"
       csv_output_file << 'Page #,Page Titles,Page Content,Image URL'
       next_output_line = ','
-      page_num = 0
+      page_num = 1
       components = 2
-      paragraphs.each_with_index do |p, ind|
+      paragraphs[1 .. -1].each_with_index do |p, ind|
+        p_num = ind+1
+        # require 'byebug'; byebug
         if is_title(p)
           filler = ',' * ([3 - components, 0].max)
 
@@ -48,7 +50,7 @@ class InputDocsController < ApplicationController
           page_num += 1
         end
         if components > 0
-          if paragraphs[ind+1].present? && !is_title(paragraphs[ind+1]) && !is_title(paragraphs[ind-1])
+          if paragraphs[p_num+1].present? && !is_title(paragraphs[p_num+1]) && !is_title(paragraphs[p_num-1])
             next_output_line.chop!
             next_output_line += "\n#{escape_quotes(p.text)}\""
           else
