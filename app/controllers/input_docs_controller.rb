@@ -2,7 +2,7 @@ require 'csv'
 
 class InputDocsController < ApplicationController
   def index
-    @input_docs = InputDoc.all
+    @input_docs = InputDoc.all.select { |idoc| puts idoc.attachment.current_path; File.exist?(idoc.attachment.current_path + '.csv')}
   end
 
   def new
@@ -36,11 +36,10 @@ class InputDocsController < ApplicationController
       csv_output_file << "Article Title:,\"#{escape_quotes(paragraphs[0].text)}\",,\n,,,\n"
       csv_output_file << 'Page #,Page Titles,Page Content,Image URL'
       next_output_line = ','
-      page_num = 1
+      page_num = 0
       components = 2
       paragraphs[1 .. -1].each_with_index do |p, ind|
         p_num = ind+1
-        # require 'byebug'; byebug
         if is_title(p)
           filler = ',' * ([3 - components, 0].max)
 
