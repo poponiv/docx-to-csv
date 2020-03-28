@@ -9,6 +9,10 @@ class InputDocsController < ApplicationController
     @input_doc = InputDoc.new
   end
 
+  def show
+    @input_doc = InputDoc.find(params[:id])
+  end
+
   def create
     begin
       @input_doc = InputDoc.new(input_doc_params)
@@ -29,20 +33,20 @@ class InputDocsController < ApplicationController
     redirect_to input_docs_path, notice:  "Successfully deleted."
   end
 
+  private
   def convert_to_csv(input_doc)
     doc = Docx::Document.open(input_doc.attachment.current_path)
     File.open(input_doc.attachment.current_path + '.csv' , 'w') do |csv_output_file|
-      paragraphs = doc.paragraphs.filter { |p| !p.text.empty? }
+      paragraphs = doc.paragraphs.filter { |p| !p.text.match(/^\s*$/) }
       csv_output_file << "Article Title:,\"#{escape_quotes(paragraphs[0].text)}\",,\n,,,\n"
       csv_output_file << 'Page #,Page Titles,Page Content,Image URL'
       next_output_line = ','
       page_num = 0
       components = 2
       paragraphs[1 .. -1].each_with_index do |p, ind|
-        p_num = ind+1
+        p_num = ind+1 # Shift by 1 because we skipped the first paragraph
         if is_title(p)
           filler = ',' * ([3 - components, 0].max)
-
           csv_output_file << "\n#{next_output_line}#{filler}"
           next_output_line = ''
           components = 0
@@ -65,7 +69,6 @@ class InputDocsController < ApplicationController
     end
   end
 
-  private
   def input_doc_params
     params.require(:input_doc).permit(:name, :attachment)
   end
