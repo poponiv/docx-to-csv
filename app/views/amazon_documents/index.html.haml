@@ -1,0 +1,25 @@
+.container
+  .py-5.text-center
+    %h1= 'Amazon Docx to CSV Converter'
+  .py-3
+    = render partial: 'new'
+  - if !flash[:notice].blank?
+    .py-3
+      - alert_type = notice =~ /Failed/ ? 'alert-danger' : 'alert-success'
+      .alert{class: alert_type}
+        = flash[:notice]
+  .py-3
+    %table.table
+      %thead
+        %tr
+          %th{scope: 'col'} File Name
+          %th{scope: 'col'} Download Docx
+          %th{scope: 'col'} Download CSV
+          %th{scope: 'col'} Action
+      %tbody
+        - @amazon_documents.each do |input_doc|
+          %tr
+            %td= input_doc.name
+            %td= link_to "Download", input_doc.attachment_url
+            %td= link_to "CSV", "#{input_doc.attachment_url}.csv"
+            %td= link_to "Delete", input_doc, method: :delete

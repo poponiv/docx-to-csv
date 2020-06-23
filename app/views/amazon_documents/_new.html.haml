@@ -1,0 +1,14 @@
+- if !@input_doc
+  - @amazon_document = AmazonDocument.new
+
+
+.row
+  .col-md-6
+    = form_for @amazon_document, html: { multipart: true } do |f|
+      .input-group.mb-3
+        .custom-file
+          = f.label :attachment, "Choose a file", class: 'custom-file-label'
+          = f.file_field :attachment, class: 'custom-file-input'
+        .pl-2
+          = f.submit "Add", {class: 'btn btn-primary'}
+

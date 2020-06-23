@@ -8,6 +8,8 @@
     = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload'
     = javascript_pack_tag 'application', 'data-turbolinks-track': 'reload'
   %body
+    .home-link
+      %a= link_to "Home", root_path
     = yield
     %footer.mt-auto.bg-info.p-3.text-white
       %span="Babinsky Media"
